@@ -18,7 +18,7 @@ mutable struct RotationGate{N,T,GT<:AbstractBlock{N}} <: PrimitiveBlock{N}
     theta::T
     function RotationGate{N,T,GT}(block::GT, theta) where {N,T,GT<:AbstractBlock{N}}
         ishermitian(block) && isreflexive(block) ||
-        throw(ArgumentError("Gate type $GT is not hermitian or not isreflexive."))
+            throw(ArgumentError("Gate type $GT is not hermitian or not isreflexive."))
         new{N,T,GT}(block, T(theta))
     end
 end
@@ -125,3 +125,9 @@ Base.:(==)(lhs::RotationGate{TA,GT}, rhs::RotationGate{TB,GT}) where {TA,TB,GT} 
     lhs.theta == rhs.theta
 
 cache_key(R::RotationGate) = R.theta
+
+function parameters_range!(out::Vector{Tuple{T,T}}, gate::RotationGate{N,T,GT}) where {N,T,GT}
+    push!(out, (0.0, 2.0 * pi))
+end
+
+occupied_locs(g::RotationGate) = occupied_locs(g.block)
